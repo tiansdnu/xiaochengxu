@@ -1,0 +1,20 @@
+<view class="container">
+  <view class="hader_wrap">
+    <view class="header_banner">
+      <view class="header_banner_tip content1">
+        「Romantic 浪漫」
+      </view>
+      <image src="../../images/flower.png"></image>
+    </view>
+    <view class="header_goods_mes text-center">
+      <!-- <view class="pull-left col-50 text-right p-r-10 content1 flower_name">混合鲜花</view>
+      <view class="pull-left col-50 text-left p-l-10 content1 flower_name">温暖的时光</view> -->
+      <view class="text-center flower_name">浪漫的少女<span></span>温暖的时光</view>
+      <view class="flower_name_tip content2">每一朵雪花，都是你迷人的微笑，每一阵冬风，都吹不散我对你的思念。</view>
+      <view class="flower_price text-green text-center">今天是情人节，愿你快乐！</view>
+      
+    </view>
+    <view class="text-center flower_name">爱你的人</view>
+    
+  </view>
+</view>
