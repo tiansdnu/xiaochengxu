@@ -51,7 +51,7 @@
   /*top: 62px;
   left: 25px;*/
   transform: translateY(62px) translateX(25px);
-  z-index: 3
+  z-index: 100;
 }
 .card_wrap .card_item.card1 .card_info {
   top: 270px;
@@ -61,7 +61,7 @@
 .card_wrap .card_item.card2 {
   /*top: 44px;
   left: 41px;*/
-  z-index: 2;
+  z-index: 50;
   transform: translateY(44px) translateX(41px);
 }
 .card_wrap .card_item.card2 .card_info {
@@ -74,7 +74,7 @@
   /*top: 28px;
   left: 51px;*/
   transform: translateY(28px) translateX(51px);
-  z-index: 1;
+  z-index: 10;
 }
 
 .card_wrap .card_item.card3 .card_info {
@@ -88,4 +88,12 @@
   height: 500px;
   border-radius: 6px;
   box-shadow: 6px 23px 50px 10px #ccc;
+}
+
+.card_img{
+  display: block;
+  position: absolute;
+  top: -240px;
+  width: 100%;
+  padding: 10px;
 }
