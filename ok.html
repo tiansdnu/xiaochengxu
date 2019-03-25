@@ -1,0 +1,679 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link type="favicon" rel="shortcut icon" href="/favicon.ico" />
+        <title>安装Jenkins并构建Docker镜像-9527-51CTO博客</title>
+    <meta name="keywords" content="使用,Jenkins,构建,Docker,镜像">
+<meta name="description" content="Jenkins是一个开源项目，提供了一种易于使用的持续集成系统，使开发者从繁杂的集成中解脱出来，专注于更为重要的业务逻辑实现上。同时Jenkins能实施监控集成中存在的错误，提供详细的日志文件和提醒功能，还能用图表的形式形象地展示项目构建的趋势和稳定性。并且Jenkins提供了大量的插件，能够完成各种任务。今天我需要使用Jenkins构建一个Docker镜像，然后自动push到dockerregi">    <link href="https://static1.51cto.com/edu/blog/css/header.css" rel="stylesheet"><link href="https://static1.51cto.com/edu/blog/css/other.css" rel="stylesheet"><link href="https://static1.51cto.com/edu/blog/css/right.css?v=3.1.6" rel="stylesheet"><link href="https://static1.51cto.com/edu/blog/css/blog_details.css" rel="stylesheet"><link href="https://static1.51cto.com/edu/blog/css/highlight.css" rel="stylesheet">
+    <script>
+        var HOME_URL = 'https://home.51cto.com/';
+    </script>
+    <script src="https://static1.51cto.com/edu/center/js/jquery.min.js"></script><script src="https://static1.51cto.com/edu/blog/js/cookie.js"></script><script src="https://static1.51cto.com/edu/blog/js/login.js"></script><script src="https://static1.51cto.com/edu/blog/js/common.js"></script><script src="https://static1.51cto.com/edu/blog/js/mbox.js"></script><script src="https://static1.51cto.com/edu/blog/js/follow.js"></script><script src="https://static1.51cto.com/edu/blog/js/vip.js"></script><script src="https://static1.51cto.com/edu/blog/js/window.js"></script></head>
+<body>
+<img src="https://static1.51cto.com/edu/blog/mobile/images/share_default.jpg" border="0" style="width:0; height:0; position:absolute;">
+<style type="text/css">
+	.service-btn{
+		width: 53px;
+height: 36px;
+color: #1ac6fe;
+line-height: 16px;
+padding-top: 50px;
+		display: inline-block;
+		background: url(https://s1.51cto.com/images/blog/201811/02/463350acf4c693cfb3dc248bc8a2a0eb.png) no-repeat center;
+	}
+	.service-btn:hover{
+		background: url(https://s1.51cto.com/images/blog/201811/02/2d5fa2ff4eb9ef66847aff20ba4c8bae.png) no-repeat center;
+height: 36px;
+color: #fff;
+line-height: 16px;
+padding-top: 50px;
+	}
+</style>
+<!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+  <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+<![endif]-->
+<div id="topbanner14" style="position: relative;width:100%;height:40px;background:url(https://s1.51cto.com/images/blog/201903/25/aa1fba3a433e149e15431e81358852f5.jpg)">
+<a class="close fl" href="javascript:;" style="position:absolute;width:13px;height:13px;top:0px;z-index: 20;background: url('https://s1.51cto.com/images/blog/201808/23/0363c65f527ea7c9880ab5f275303d1a.png') 0 0 no-repeat;background-size: 100% 100%;left: 50%;margin-left: 587px;"></a>
+<a href="https://blog.51cto.com/cloumn/index?bannerj" target="_blank">
+  <img src="https://s1.51cto.com/images/blog/201903/25/c153506fd93c2f18ed3396097c3c08f9.jpg" alt="" style="position:absolute;width:1200px;height:40px;margin-left: -600px;left:50%;z-index: 10;">
+</a>
+</div>
+<script>
+    $("#topbanner14").on("click",".close",function(){
+        $("#topbanner14").remove();
+    })
+</script>
+<div class="Header">
+  <div class="Page ">
+    <h1 class="Logo"><a href="https://blog.51cto.com/">Logo</a></h1>
+    <ul class="Navigates fl">
+      <li ><a href="https://blog.51cto.com/">首页</a></li>
+      <li ><a href="https://blog.51cto.com/original">文章</a></li>
+      <li ><a href="https://blog.51cto.com/blog/follow">关注</a></li>
+      <li class="">
+        <a class="column-stress" href="https://blog.51cto.com/cloumn/index" target="_blank">订阅专栏</a>
+      </li>
+                    
+      
+    </ul>
+    <ul class="Navigates Navigates-right fr">
+      <li class="more maps">
+        <a href="javascript:void(0);">网站导航</a>
+        <div>
+            <a href="https://edu.51cto.com/" target="_blank">学院</a>
+            <a href="https://blog.51cto.com/" target="_blank">博客</a>
+            <a href="http://down.51cto.com/" target="_blank">下载</a>
+            <a href="https://home.51cto.com/" target="_blank">家园</a>
+            <a href="http://bbs.51cto.com/" target="_blank">论坛</a>
+            <a href="http://x.51cto.com" target="_blank">CTO训练营</a>
+            <a href=" http://club.51cto.com?blog" target="_blank">CTO俱乐部</a>
+            <a href="http://wot.51cto.com" target="_blank">WOT</a>
+            <a href="http://www.51cto.com" target="_blank">51CTO</a>
+            <i class="arrow"></i>
+        </div>
+      </li>
+                <li><a href="/site/login?reback=https%3A%2F%2Fblog.51cto.com%2F10158955%2F2146748&logintype=reg" target="_self">注册</a></li>
+          <li class="login"><a href="/site/login?reback=https%3A%2F%2Fblog.51cto.com%2F10158955%2F2146748" target="_self">登录</a></li>
+                        <li class="mRead">
+          <a href="javascript:;">手机阅读</a>
+          <div>
+            <img src="https://static1.51cto.com/edu/blog/images/blog_qr.png">
+            <p>扫一扫体验手机阅读</p>
+            <i class="arrow"></i>
+          </div>
+        </li>
+            <li class="search"><a href="https://blog.51cto.com/search/index"  target="_self">搜索</a></li>
+                  <li class="write"><a href="javascript:;" onClick="Login()">写文章</a></li>
+                  </ul>
+
+          <div class="clear"></div>
+  </div>
+</div>
+<script src="https://static1.51cto.com/edu/blog/mobile/js/lib/box.js"></script> 
+<script>
+    var isLogin = '0';
+    var userId = '';
+    var imgpath = 'https://s1.51cto.com/';
+    var BLOG_URL = 'https://blog.51cto.com/';
+    var msg_num_url = '/index/ajax-msg-num';
+    $('.msg-follow, .msg-follow-max').eq(1).css({top: '91px'});
+    $('.msg-follow, .msg-follow-max').eq(2).css({top: '121px'});
+    setTimeout(function(){
+            $.ajax({
+                url:msg_num_url,
+                type:"get",
+                dataType:'json',
+                success:function(res){
+                    if(res.status == '0'){
+                       //
+                       var hasNewMsg = false;
+                       if(res.data.msgNum > 0 && !$('#myMsg i').hasClass('dot')){
+                            $('#myMsg i').addClass('dot');
+                            hasNewMsg = true;
+                       }
+                       if(res.data.notifyNum > 0 && !$('#myNotify i').hasClass('dot')){
+                           $('#myNotify i').addClass('dot');
+                           hasNewMsg = true;
+                       }
+                       if(res.data.recommend_new > 0 && !$('#myRecommend i').hasClass('dot')){
+                           $('#myRecommend i').addClass('dot');
+                           hasNewMsg = true;
+                       }
+                       if(hasNewMsg && !$('#myAllMsg i').hasClass('dot')){
+                           $('#myAllMsg i').addClass('dot');
+                       }
+                    }
+
+                }
+            });
+    },70);
+    //广告图
+$(function(){
+     new AutoAD({
+      ADD:$('<a href="https://blog.51cto.com/cloumn/index?pc" class="closeMB" target="_blank" styel="display:block;"><img src="https://s1.51cto.com/images/blog/201903/25/fa9eb057c0e10a512d6e7c5977e990d9.jpg"></a><a class="closeMB" style="position: absolute;right:2px;top: 3px;width: 50px;height: 40px;cursor: pointer;" href="javascript:;"></a>'),
+      W:500,
+      H:400,
+      cookie:'blog_activity_blog36',
+      mask:"#000",
+      ts:'21600',
+      noCBtn: true
+    }) 
+})    
+</script>
+ <script src="//www.sobot.com/chat/frame/js/entrance.js?sysNum=a8d9379eaf884b4f81a48348979e3b1a" id="zhichiScript" class="zhiCustomBtn" data-args="manual=true"></script>
+<a href="javascript:;" class="zhiCustomBtn" style="position: fixed;z-index: 2147483583;width: 60px;height: 6px;text-align: center;bottom:275px;right:0px;">
+<span class="service-btn">在线<br/>客服</span>
+</a>
+
+<script type="text/javascript">
+var zhiManager = (getzhiSDKInstance());
+zhiManager.on("load", function() {
+    zhiManager.initBtnDOM();
+});
+//zhiManager.set('title','垃圾/广告信息举报');
+zhiManager.set('powered',false);
+zhiManager.set('color', '4285f4');
+zhiManager.set('customBtn', 'true');
+zhiManager.set('moduleType',2);
+zhiManager.set('size',{'width':360,'height':500});
+
+zhiManager.set('userinfo', {partnerId:'',uname:'',params:'{"用户名":""}'});
+zhiManager.set('customMargin', 20);
+zhiManager.set('horizontal', 20);
+zhiManager.set('vertical', 90);
+zhiManager.set('preVisitArgs',{'preVisitUrl': document.referrer?document.referrer:''});
+zhiManager.set('curVisitArgs',{'curVisitUrl': location.href,curVisitTitle:document.title,});
+</script>
+<div class="Content-box">
+    	<link rel="stylesheet" href="https://static1.51cto.com/edu/blog/css/mdeShow.css">
+<link rel="stylesheet" href="https://static1.51cto.com/edu/blog/css/tinyscrollbar.css"/>
+<script type="text/javascript" src="https://static1.51cto.com/edu/blog/js/jquery.tinyscrollbar.js"></script>
+<div class="Content Index" style="padding-bottom: 50px;">
+	<div class="Page M764">
+		<!-- left start -->
+		<div class="artical-Left-blog">
+			<div class="status">
+	        					<a class="tab_name original">原创</a>
+							</div>
+			<h1 class="artical-title">安装Jenkins并构建Docker镜像</h1>
+			<div class="artical-title-list">
+				<div class="is-vip-bg-6 fl">
+					<a href="https://blog.51cto.com/10158955" class="a-img" target="_blank"><img class="is-vip-img is-vip-img-4" data-uid="10148955" src="https://ucenter.51cto.com/images/noavatar_middle.gif"></a>
+				</div>
+				<a href="https://blog.51cto.com/10158955" class="name fl" target="_blank" style="margin-right:0;">清风一明月</a>
+									                	                    <a id="checkFollow1_10148955" class="checkFollow-btn on fl" style="margin-left:8px;">关注</a>
+	                	            				<a class="comment comment-num fr"><font class="comment_number">2</font>人评论</a>
+				<span class="fr"></span>
+				<a href="javascript:;" class="read fr">16781人阅读</a>
+				<a href="javascript:;" class="time fr">2018-07-18 15:23:37</a>
+				<div class="clear"></div>
+			</div>
+							<div class="artical-content-bak main-content">
+					<div class="con artical-content editor-preview-side"><p>Jenkins是一个开源项目，提供了一种易于使用的持续集成系统，使开发者从繁杂的集成中解脱出来，专注于更为重要的业务逻辑实现上。同时Jenkins能实施监控集成中存在的错误，提供详细的日志文件和提醒功能，还能用图表的形式形象地展示项目构建的趋势和稳定性。并且Jenkins提供了大量的插件，能够完成各种任务。</p>
+<p>今天我需要使用Jenkins构建一个Docker镜像，然后自动push到docker registry中。到了docker registry中，后面测试人员就可以把镜像发布到测试环境，测试如果没有问题就可以发布到线上环境。</p>
+<p>下面先介绍Jenkins构建docker镜像，在使用Jenkins构建Docker镜像之前，最好先看一下Docker：使用Dockerfile构建Nginx镜像 <a href="http://www.ywnds.com/?p=7611" rel="nofollow">http://www.ywnds.com/?p=7611</a><br/><strong>安装Jenkins</strong><br/>添加Jenkins的源（repository）<br/>sudo wget -O /etc/yum.repos.d/jenkins.repo <a href="http://jenkins-ci.org/redhat/jenkins.repo" rel="nofollow">http://jenkins-ci.org/redhat/jenkins.repo</a><br/>sudo rpm --import <a href="http://pkg.jenkins-ci.org/redhat/jenkins-ci.org.key" rel="nofollow">http://pkg.jenkins-ci.org/redhat/jenkins-ci.org.key</a></p>
+<p>安装JDK<br/>yum install java-1.8.0-openjdk -y 或者tar包安装都一样<br/>java version &quot;1.8.0_171&quot;<br/>Java(TM) SE Runtime Environment (build 1.8.0_171-b11)<br/>Java HotSpot(TM) 64-Bit Server VM (build 25.171-b11, mixed mode)</p>
+<p>yum install jenkins -y<br/>rpm -qi jenkins | grep Version<br/>Version     : 2.132 （版本会不断更新）<br/>启动Jenkins<br/>service jenkins start  （start,stop,restart）<br/>到此，Jenkins就安装完成了，然后就可以启动Jenkins。<br/>Jenkins默认监控端口8080，查看Jenkins进程。<br/><img src="https://s1.51cto.com/images/blog/201807/18/ec58a55a5c6c54e3c952d28fae2c9b3a.png?x-oss-process=image/watermark,size_16,text_QDUxQ1RP5Y2a5a6i,color_FFFFFF,t_100,g_se,x_10,y_10,shadow_90,type_ZmFuZ3poZW5naGVpdGk=" alt="安装Jenkins并构建Docker镜像" /></p>
+<p><strong>Jenkins文件说明</strong><br/>jenkins相关目录释义：<br/>(1)/usr/lib/jenkins/：jenkins安装目录，war包会放在这里。<br/>(2)/etc/sysconfig/jenkins：jenkins配置文件，“端口”，“JENKINS_HOME”等都可以在这里配置。<br/>(3)/var/lib/jenkins/：默认的JENKINS_HOME。<br/>(4)/var/log/jenkins/jenkins.log：jenkins日志文件。</p>
+<p>/var/lib/jenkins/jobs/${project_name}/workspace/：Jenkins项目的工作空间，存储从Git或SVN下载的内容，${project_name}就是其项目名称。</p>
+<p><strong>配置Jenkins构建镜像</strong><br/>如果没有特别配置端口，使用http://&lt;ip address&gt;:8080/登录Jenkins，并进行相关配置（插件安装、权限配置、View/Job创建等等）。</p>
+<p>第一次登陆Jenkins时需要解锁，把如下秘钥填写进去即可。<br/>cat /var/lib/jenkins/secrets/initialAdminPassword<br/>a737ebbbfece4e6991cf70d45a299ed5<br/><img src="https://s1.51cto.com/images/blog/201807/18/3eecdcf030e5c81ade057ec9e93737e7.png?x-oss-process=image/watermark,size_16,text_QDUxQ1RP5Y2a5a6i,color_FFFFFF,t_100,g_se,x_10,y_10,shadow_90,type_ZmFuZ3poZW5naGVpdGk=" alt="安装Jenkins并构建Docker镜像" /></p>
+<p>然后设置一下用户密码，就正式进入到了Jenkins配置界面。<br/><img src="https://s1.51cto.com/images/blog/201810/13/2277c3da4b64016fb1bce8620c07bf5e.png?x-oss-process=image/watermark,size_16,text_QDUxQ1RP5Y2a5a6i,color_FFFFFF,t_100,g_se,x_10,y_10,shadow_90,type_ZmFuZ3poZW5naGVpdGk=" alt="安装Jenkins并构建Docker镜像" /><br/>首先，需要安装一些必要的插件SCM Sync Configuration Plugin ，（gitlab）GitHub plugin ，GIT plugin ，GIT client plugin，在系统管理-&gt;插件管理里面安装，安装结束后重启jenkins即可。<br/><img src="https://s1.51cto.com/images/blog/201810/13/935f6697daba9b30ffbb940f8d066a68.png?x-oss-process=image/watermark,size_16,text_QDUxQ1RP5Y2a5a6i,color_FFFFFF,t_100,g_se,x_10,y_10,shadow_90,type_ZmFuZ3poZW5naGVpdGk=" alt="安装Jenkins并构建Docker镜像" /><br/>然后创建一个项目为nginx。<br/><img src="https://s1.51cto.com/images/blog/201807/18/27da7fe72fa3a366956119bce8690336.png?x-oss-process=image/watermark,size_16,text_QDUxQ1RP5Y2a5a6i,color_FFFFFF,t_100,g_se,x_10,y_10,shadow_90,type_ZmFuZ3poZW5naGVpdGk=" alt="安装Jenkins并构建Docker镜像" /><br/>然后配置一下源码管理，Git地址：<a href="https://github.com/dongwenpeng/nginx" rel="nofollow">https://github.com/dongwenpeng/nginx</a></p>
+<p>就下面几个文件，主要是dockerfile，然后提供了一些nginx配置文件以及web文件。<br/>-rw-r--r-- 1 jenkins jenkins    744 Dec 27 20:22 default.conf<br/>-rw-r--r-- 1 jenkins jenkins    338 Dec 27 20:22 dockerfile<br/>-rw-r--r-- 1 jenkins jenkins    593 Dec 27 20:22 nginx.conf<br/>drwxr-xr-x 3 jenkins jenkins     16 Dec 27 20:22 web<br/>-rw-r--r-- 1 jenkins jenkins 644118 Dec 27 20:22 web.zip</p>
+<p>如下配置，也可以使用你本地的Git仓库：<br/><img src="https://s1.51cto.com/images/blog/201807/18/6264ac2597f389aa2508f88436686c6b.png?x-oss-process=image/watermark,size_16,text_QDUxQ1RP5Y2a5a6i,color_FFFFFF,t_100,g_se,x_10,y_10,shadow_90,type_ZmFuZ3poZW5naGVpdGk=" alt="安装Jenkins并构建Docker镜像" /></p>
+<p>主要就是构建脚本了。<br/><img src="https://s1.51cto.com/images/blog/201807/18/45137b6cb444f0cf132a1b9d84513df5.png?x-oss-process=image/watermark,size_16,text_QDUxQ1RP5Y2a5a6i,color_FFFFFF,t_100,g_se,x_10,y_10,shadow_90,type_ZmFuZ3poZW5naGVpdGk=" alt="安装Jenkins并构建Docker镜像" /></p>
+<p>脚本内容<br/>#!/bin/sh<br/>#<br/>DATE=<code>date +%m%d%H%M</code><br/>DIR=&quot;/var/lib/jenkins/jobs/nginx/workspace&quot;</p>
+<p>sudo /bin/docker build -t nginx_$DATE $DIR | tee $DIR/Docker_build_result.log</p>
+<p>RESULT=$(cat $DIR/Docker_build_result.log | tail -n 1)</p>
+<p>if [[&quot;$RESULT&quot; != <em>Successfully</em>]];then<br/>exit -1<br/>fi</p>
+<p>注意：这里说明几点，第一git没有的就安装 yum -y install git<br/>/var/lib/jenkins/jobs/nginx/workspace这里的路径少了个workspace需要创建<br/>chown -R jenkins:jenkins workspace/<br/>之后要重启Jenkins。</p>
+<p><strong>配置jenkins用户</strong><br/>此时还不能立即构建，因为jenkins触发脚本并不是root用户，因此需要将jenkins免密码，并将用户加入到docker组。（这里docker 没有也要安装 <a href="https://blog.51cto.com/10158955/2125450">https://blog.51cto.com/10158955/2125450</a> ）<br/>cat /etc/sudoers.d/jenkins<br/>Defaults:jenkins !requiretty<br/>jenkins ALL=(ALL) NOPASSWD: ALL<br/>第一行表示仅jenkins用户不需要控制终端，不然在Jenkins脚本中无法使用sudo。<br/>usermod -G docker jenkins<br/>（创建docker组   groupadd docker  ）</p>
+<p><strong>开始构建镜像</strong><br/>在jenkins的build记录中可以看到输出，由于jenkins会自动把github上的文件给下载下来放在workspace目录中。因此，触发脚本后，直接开始构建nginx镜像。<br/>Started by user admin<br/>Building in workspace /var/lib/jenkins/jobs/nginx/workspace</p>
+<blockquote>
+<p>git rev-parse --is-inside-work-tree # timeout=10<br/>Fetching changes from the remote Git repository<br/>git config remote.origin.url <a href="https://github.com/dongwenpeng/nginx" rel="nofollow">https://github.com/dongwenpeng/nginx</a> # timeout=10<br/>Fetching upstream changes from <a href="https://github.com/dongwenpeng/nginx" rel="nofollow">https://github.com/dongwenpeng/nginx</a><br/>git --version # timeout=10<br/>git fetch --tags --progress <a href="https://github.com/dongwenpeng/nginx" rel="nofollow">https://github.com/dongwenpeng/nginx</a> +refs/heads/<em>:refs/remotes/origin/</em><br/>git rev-parse refs/remotes/origin/master^{commit} # timeout=10<br/>git rev-parse refs/remotes/origin/origin/master^{commit} # timeout=10<br/>Checking out Revision c0148c6714be8a64710d87e2ebc3395573dfcb0f (refs/remotes/origin/master)<br/>git config core.sparsecheckout # timeout=10<br/>git checkout -f c0148c6714be8a64710d87e2ebc3395573dfcb0f<br/>git rev-list c0148c6714be8a64710d87e2ebc3395573dfcb0f # timeout=10<br/>[workspace] $ /bin/sh /tmp/hudson3618361245563383297.sh<br/>Sending build context to Docker daemon 557.1 kB<br/>Sending build context to Docker daemon 1.114 MB<br/>Sending build context to Docker daemon 1.671 MB<br/>Sending build context to Docker daemon 2.228 MB<br/>Sending build context to Docker daemon 2.785 MB<br/>Sending build context to Docker daemon 3.273 MB<br/>Step 1 : FROM nginx<br/>latest: Pulling from library/nginx<br/>Digest: sha256:2a07a07e5bbf62e7b583cbb5257357c7e0ba1a8e9650e8fa76d999a60968530f<br/>Status: Downloaded newer image for nginx:latest<br/>---&gt; 19146d5729dc<br/>Step 2 : MAINTAINER dkey<br/>---&gt; Using cache<br/>---&gt; 715cd864289f<br/>Step 3 : ENV RUN_USER nginx<br/>---&gt; Using cache<br/>---&gt; 919de987c861<br/>Step 4 : ENV RUN_GROUP nginx<br/>---&gt; Using cache<br/>---&gt; 12bb383d0cdc<br/>Step 5 : ENV DATA_DIR /data/web<br/>---&gt; Using cache<br/>---&gt; 69561736d70e<br/>Step 6 : ENV LOG_DIR /data/log/nginx<br/>---&gt; Using cache<br/>---&gt; c9be367631c7<br/>Step 7 : RUN mkdir /data/log/nginx -p<br/>---&gt; Using cache<br/>---&gt; 137c4decd554<br/>Step 8 : RUN chown nginx.nginx -R /data/log/nginx<br/>---&gt; Using cache<br/>---&gt; 4262ffbc2a5c<br/>Step 9 : ADD web /data/web<br/>---&gt; ac936a598dc4<br/>Removing intermediate container 1efe9556276a<br/>Step 10 : ADD nginx.conf /etc/nginx/nginx.conf<br/>---&gt; 2b6f7ab35d9f<br/>Removing intermediate container 12b1066d8808<br/>Step 11 : ADD default.conf /etc/nginx/conf.d/default.conf<br/>---&gt; 619fc14e58bf<br/>Removing intermediate container 362067e9bbce<br/>Step 12 : EXPOSE 80<br/>---&gt; Running in ace973e663f0<br/>---&gt; 7982205f27dd<br/>Removing intermediate container ace973e663f0<br/>Step 13 : ENTRYPOINT nginx -g &quot;daemon off;&quot;<br/>---&gt; Running in 892e45827ff4<br/>---&gt; 63375850b045<br/>Removing intermediate container 892e45827ff4<br/>Successfully built 63375850b045<br/>Finished: SUCCESS</p>
+</blockquote>
+<p>构建完成后，可以去Jenkins主机看看镜像是否完成。<br/>docker images<br/>REPOSITORY                  TAG                 IMAGE ID            CREATED             SIZE<br/>nginx_12272051              latest              63375850b045        58 minutes ago      182.7 MB<br/>nginx                       latest              19146d5729dc        6 days ago          181.6 MB</p>
+<p>可以看到已经构建完成了，下面直接启动此镜像。<br/>docker run --name nginx -p 80:80 -d nginx_12272051</p>
+<p>docker ps<br/>CONTAINER ID      IMAGE              COMMAND                  CREATED             STATUS            PORTS                         NAMES<br/>c6ca642a3574      nginx_12272051     &quot;/bin/sh -c 'nginx -g&quot;   18 seconds ago      Up 17 seconds     0.0.0.0:80-&gt;80/tcp, 443/tcp   nginx</p>
+<p>推送到远程仓库</p>
+<p>现在使用Jenkins构建Docker镜像已经没有问题了，下面就可以把Jenkins构建完的镜像直接推送到远程的registry中。关于构建私有docker registry可以看Docker：搭建私有仓库（Registry 2.4）<a href="http://www.ywnds.com/?p=7411" rel="nofollow">http://www.ywnds.com/?p=7411</a></p>
+<p>当远程仓库搞定后，其实Jenkins这边做的并不是太多，只需要把构建脚本修改一下，在构建完成后直接推送到远程仓库就OK了。</p></div>
+				</div>
+													<div class="artical-copyright mt26">©著作权归作者所有：来自51CTO博客作者清风一明月的原创作品，如需转载，请注明出处，否则将追究法律责任</div>
+									<div class="for-tag mt26">
+																						<a href="https://blog.51cto.com/search/result?q=%E4%BD%BF%E7%94%A8" target="_blank">使用</a>
+																								<a href="https://blog.51cto.com/search/result?q=Jenkins" target="_blank">Jenkins</a>
+																								<a href="https://blog.51cto.com/search/result?q=%E6%9E%84%E5%BB%BA" target="_blank">构建</a>
+																																					                				<a class="last" href="https://blog.51cto.com/10158955/category12.html" target="_blank"><i></i>Jenkins+gitlab</a>
+                				<div class="clear"></div>
+			</div>
+			<div class="more-list">
+				<p class="is-praise fl "><span type="1" blog_id="2146748" userid='10148955'>0</span></p>
+				<div class="share-box fr">
+					<p class="share"><i></i>分享</p>
+					<div class="bdsharebuttonbox">
+					  <span></span>
+					  <a class="bds_tsina" data-cmd="tsina" >微博</a>
+					  <a class="bds_sqq" data-cmd="sqq" >QQ</a>
+					  <a class="bds_weixin" data-cmd="weixin" >微信</a>
+					  <img src="/qr/qr-url?url=https%3A%2F%2Fblog.51cto.com%2F10158955%2F2146748">
+					</div>
+				</div>
+				<p class="favorites favorites-opt fr"><i></i>收藏</p>
+								<div class="clear"></div>
+			</div>
+							<div class="artical-list">
+	            					<a class="fl" href="https://blog.51cto.com/10158955/2145939" title="zabbix3微信报警设置">
+						上一篇：zabbix3微信报警设置</a>
+	            	            					<a class="fr" href="https://blog.51cto.com/10158955/2147872" title="jenkins+Gitlab+maven+tomcat实现自动化集成、打包、部署。">
+						下一篇：jenkins+Gitlab+m...</a>
+	            					<div class="clear"></div>
+				</div>
+						<div class="author-module">
+				<div class="is-vip-bg-6 fl">
+					<a href="https://blog.51cto.com/10158955" class="a-img" target="_blank">
+						<img class="is-vip-img is-vip-img-4" data-uid="10148955" src="https://ucenter.51cto.com/images/noavatar_middle.gif">
+					</a>
+				</div>
+				<div class="author-module-center fl">
+					<a class="h2" href="https://blog.51cto.com/10158955" target="_blank" style="display:inline-block;">清风一明月</a>
+										<h3>60篇文章，35W+人气，6粉丝</h3>
+					<h4>一梦十年！</h4>				</div>
+									<div class="author-module-right author-checkFollow fr">
+          	                  <a id="checkFollow2_10148955" class="follow-1 checkFollow on">关注</a>
+              					</div>
+        				<div class="clear"></div>
+			</div>
+		</div>
+		<div class="artical-Left" id="comment">
+			<!-- 发布评论 -->
+			<div class="comment-creat">
+				<div class="is-vip-bg-6 fl">
+					<a href="https://blog.51cto.com/10158955" class="header-img" target="_blank">
+						<img  src="https://ucenter.51cto.com/images/noavatar_middle.gif"/>
+					</a>
+				</div>
+				<div class="first-publish fr publish_user_id">
+					<textarea class="textareadiv textareadiv-publish" name="" id="" placeholder="提问和评论都可以，用心的回复会被更多人看到和认可"  maxlength="500"></textarea>
+					<div class="comment-push">
+						<p class="msg fl">Ctrl+Enter&nbsp;发布</p>
+													<p class="publish-btn blue-btn fr" flag="1">发布</p>
+												<p class="cancel-btn cancel-btn-1 fr">取消</p>
+						<div class="clear"></div>
+					</div>
+					<input type="hidden" class="user_id" value="10148955">
+					<input type="hidden" class="reply_id" value="2146748">
+					<input type="hidden" class="first_pid" value="">
+				</div>
+				<div class="clear"></div>
+			</div>
+							<div class="comment-number" id="comment_pl">
+					<p class="number fl"><span class="comment_number">2</span>条评论</p>
+					<a class="time-last time fr comment-sort" id="sort-desc" flag="desc"  page="1" >按时间倒序</a>
+				    <a class="time-first time fr comment-sort on" id="sort-asc" flag="asc"  page="1" >按时间正序</a>
+				    <div class="clear"></div>
+				</div>
+						<div class="commentList">
+			</div>
+			<!-- page -->
+			<div class="act_pageList_box"></div>
+		</div>
+		<!-- end left -->
+		<!-- right start -->
+		<div class="Blog-Right artical-Right">
+			<a class="catalog"></a>
+			<a class="scrollTop" href="javascript:void(0);" onclick="$(window).scrollTop(0);"></a>
+		</div>
+		<!-- end right  -->
+	</div>
+			<div class="special-column">
+			<div class="Page M764">
+									<div class="column-1">
+						<h2 class="column-tit">推荐专栏<a href="/cloumn/index?utm_source=p" target="_blank"><span class="recommend-more-span" style="">更多</span></a></h2>
+													<div class="column-box">
+								<a href="https://blog.51cto.com/cloumn/detail/13" class="a-img fl cloumn-tab-par" target="_blank">
+									<img src="https://s1.51cto.com/images/blog/201808/03/a940c66317ecbe58436a2ad3831c2d7d.png">
+                													</a>
+								<div class="center fl">
+									<a class="h2 white-space" href="https://blog.51cto.com/cloumn/detail/13" target="_blank"> 基于Python的DevOps实战</a>
+									<h3 class="white-space">自动化运维开发新概念</h3>
+									<h4 class="white-space">共20章&nbsp;|&nbsp;<a href="https://blog.51cto.com/yuhongchun" target="_blank">抚琴煮酒</a></h4>
+									<h5><span class="price">
+                                    ￥51.00
+                                    </span><span>391人订阅</span></h5>
+								</div>
+								<div class="right fr">
+							        																							<a class="cloumn-subscribe" cid="13" href="/cloumn/detail/13" ask='1' target="_blank">订&nbsp;&nbsp;&nbsp;阅</a>
+																			    								</div>
+								<div class="clear"></div>
+							</div>
+													<div class="column-box">
+								<a href="https://blog.51cto.com/cloumn/detail/30" class="a-img fl cloumn-tab-par" target="_blank">
+									<img src="https://s1.51cto.com/images/blog/201811/06/5353379fc95da1d7d34fd243b9ace17f.jpg">
+                													</a>
+								<div class="center fl">
+									<a class="h2 white-space" href="https://blog.51cto.com/cloumn/detail/30" target="_blank"> 全局视角看大型园区网</a>
+									<h3 class="white-space">路由交换+安全+无线+优化+运维</h3>
+									<h4 class="white-space">共40章&nbsp;|&nbsp;<a href="https://blog.51cto.com/weilan2222" target="_blank">51CTO夏杰</a></h4>
+									<h5><span class="price">
+                                    ￥51.00
+                                    </span><span>1233人订阅</span></h5>
+								</div>
+								<div class="right fr">
+							        																							<a class="cloumn-subscribe" cid="30" href="/cloumn/detail/30" ask='1' target="_blank">订&nbsp;&nbsp;&nbsp;阅</a>
+																			    								</div>
+								<div class="clear"></div>
+							</div>
+													<div class="column-box">
+								<a href="https://blog.51cto.com/cloumn/detail/18" class="a-img fl cloumn-tab-par" target="_blank">
+									<img src="https://s1.51cto.com/images/blog/201808/20/45862f289339dc922ffda669fd74ad9b.jpg">
+                													</a>
+								<div class="center fl">
+									<a class="h2 white-space" href="https://blog.51cto.com/cloumn/detail/18" target="_blank"> 网工2.0晋级攻略 ——零基础入门Python/Ansible</a>
+									<h3 class="white-space">网络工程师2.0进阶指南</h3>
+									<h4 class="white-space">共30章&nbsp;|&nbsp;<a href="https://blog.51cto.com/gingerbeer" target="_blank">姜汁啤酒</a></h4>
+									<h5><span class="price">
+                                    ￥51.00
+                                    </span><span>1419人订阅</span></h5>
+								</div>
+								<div class="right fr">
+							        																							<a class="cloumn-subscribe" cid="18" href="/cloumn/detail/18" ask='1' target="_blank">订&nbsp;&nbsp;&nbsp;阅</a>
+																			    								</div>
+								<div class="clear"></div>
+							</div>
+													<div class="column-box">
+								<a href="https://blog.51cto.com/cloumn/detail/6" class="a-img fl cloumn-tab-par" target="_blank">
+									<img src="https://s1.51cto.com/images/blog/201811/28/629650e188ddde78b213e564c2e9ebff.jpg">
+                													</a>
+								<div class="center fl">
+									<a class="h2 white-space" href="https://blog.51cto.com/cloumn/detail/6" target="_blank"> 负载均衡高手炼成记</a>
+									<h3 class="white-space">高并发架构之路</h3>
+									<h4 class="white-space">共15章&nbsp;|&nbsp;<a href="https://blog.51cto.com/sery" target="_blank">sery</a></h4>
+									<h5><span class="price">
+                                    ￥51.00
+                                    </span><span>477人订阅</span></h5>
+								</div>
+								<div class="right fr">
+							        																							<a class="cloumn-subscribe" cid="6" href="/cloumn/detail/6" ask='1' target="_blank">订&nbsp;&nbsp;&nbsp;阅</a>
+																			    								</div>
+								<div class="clear"></div>
+							</div>
+													<div class="column-box">
+								<a href="https://blog.51cto.com/cloumn/detail/5" class="a-img fl cloumn-tab-par" target="_blank">
+									<img src="https://s1.51cto.com/images/blog/201804/27/dc6736c5fd50474b5df8b76b040e3d03.jpg">
+                													</a>
+								<div class="center fl">
+									<a class="h2 white-space" href="https://blog.51cto.com/cloumn/detail/5" target="_blank"> 带你玩转高可用</a>
+									<h3 class="white-space">前百度高级工程师的架构高可用实战</h3>
+									<h4 class="white-space">共15章&nbsp;|&nbsp;<a href="https://blog.51cto.com/13527416" target="_blank">曹林华</a></h4>
+									<h5><span class="price">
+                                    ￥51.00
+                                    </span><span>448人订阅</span></h5>
+								</div>
+								<div class="right fr">
+							        																							<a class="cloumn-subscribe" cid="5" href="/cloumn/detail/5" ask='1' target="_blank">订&nbsp;&nbsp;&nbsp;阅</a>
+																			    								</div>
+								<div class="clear"></div>
+							</div>
+											</div>
+													<div class="column-2" style="margin-top: 76px;">
+						<h2 class="column-tit">猜你喜欢</h2>
+						<div class="column-box">
+															<a class="white-space" href="https://blog.51cto.com/10158955/2286792?source=dra" target="_blank">kong 负载均衡</a>
+															<a class="white-space" href="https://blog.51cto.com/10158955/2177052?source=dra" target="_blank">API gateway 之 kong0.12.3 安装</a>
+															<a class="white-space" href="https://blog.51cto.com/13438667/2059926?source=drt" target="_blank">windows10用WMware安装Linux虚拟机详细步骤</a>
+															<a class="white-space" href="https://blog.51cto.com/android/384844?source=drt" target="_blank">Java内部类的使用小结</a>
+															<a class="white-space" href="https://blog.51cto.com/13589448/2068546?source=drt" target="_blank">Ansible之playbook的使用</a>
+															<a class="white-space" href="https://blog.51cto.com/drizzlewalk/448874?source=drt" target="_blank">python下的MySQLdb使用</a>
+															<a class="white-space" href="https://blog.51cto.com/ityouknow/2083688?source=drt" target="_blank">Docker(一)：Docker入门教程</a>
+															<a class="white-space" href="https://blog.51cto.com/waringid/945352?source=drt" target="_blank">Zabbix中文使用手册</a>
+															<a class="white-space" href="https://blog.51cto.com/lizhenliang/2159817?source=drt" target="_blank">Jenkins与Docker的自动化CI/CD实战</a>
+															<a class="white-space" href="https://blog.51cto.com/tryingstuff/2066561?source=drt" target="_blank">使用Ambari搭建Hadoop集群</a>
+															<a class="white-space" href="https://blog.51cto.com/lavasoft/52975?source=drt" target="_blank">Java日期时间使用总结</a>
+															<a class="white-space" href="https://blog.51cto.com/leihenzhimu/625015?source=drt" target="_blank">使用UltraISO将苹果dmg文件转换标准ISO镜像</a>
+															<a class="white-space" href="https://blog.51cto.com/270142877/2366067?source=drh" target="_blank">StatefulSet在Kubernetes中的应用</a>
+															<a class="white-space" href="https://blog.51cto.com/270142877/2365489?source=drh" target="_blank">使用阿里云Kubernetes实现MySQL数据持久化存储--单实例</a>
+															<a class="white-space" href="https://blog.51cto.com/qiuyue/2365461?source=drh" target="_blank">CentOS 7.6安装配置Keepalived详解（二）：高可用IPVS DR模型</a>
+															<a class="white-space" href="https://blog.51cto.com/xmomo/2365191?source=drh" target="_blank">CentOS7 搭建企业级NFS网络文件服务器</a>
+															<a class="white-space" href="https://blog.51cto.com/goome/2364702?source=drh" target="_blank">k8s实践6:从解决报错开始入门RBAC</a>
+															<a class="white-space" href="https://blog.51cto.com/14236481/2364685?source=drh" target="_blank">Django+Django-Celery+Celery的整合实战</a>
+															<a class="white-space" href="https://blog.51cto.com/3842834/2364563?source=drh" target="_blank">Linux 性能测试工具 sysbench 的安装与简单使用</a>
+															<a class="white-space" href="https://blog.51cto.com/m51cto/2363354?source=drh" target="_blank">Nginx10m+高并发内核优化详解</a>
+														<div class="clear"></div>
+						</div>
+					</div>
+							</div>
+		</div>
+		<div class="group_img_box">
+		<div class="group_git_box">
+        			<img src="https://s1.51cto.com/images/blog/201810/22/078772c84eb23213ea90f577d9316ce4.png"/>
+        		</div>
+			<div class="group_code_box">
+			<img src="https://static1.51cto.com/edu/blog/mobile/images/left-qr.jpg" width="130" height="130">
+			<p>扫一扫,领取大礼包</p>
+		</div>
+	</div>		
+	<div class="the-lowest-bg">
+		<div class="the-lowest Page M764">
+			<p class="is-praise fl "><span type="1" blog_id="2146748" userid='10148955'></span></p>
+			<p class="b-favorites favorites-opt fl"><i></i><b>0</b></p>
+			<a class="b-reply fl"><i></i><font class="comment_number">2</font></a>
+			<div class="b-share fl">
+				<i></i>分享
+				<div class="bdsharebuttonbox">
+				  <a class="bds_tsina p2" data-cmd="tsina"></a>
+				  <a class="bds_sqq p3" data-cmd="sqq"></a>
+				  <a class="bds_weixin p1" data-cmd="weixin"><em class="code-icon"></em><img class="code-img" src="/qr/qr-url?url=https%3A%2F%2Fblog.51cto.com%2F10158955%2F2146748"></a>
+				</div>
+			</div>
+      				<div class="b-fllow author-checkFollow fr" style="margin-left: 20px;">
+                        <a id="checkFollow3_10148955" class="follow-1 checkFollow on">关注</a>
+          				</div>
+      						<a href="https://blog.51cto.com/10158955" class="b-name fr">清风一明月</a>
+			<div class="is-vip-bg-6 fr">
+				<a href="https://blog.51cto.com/10158955" class="b-img"><img class="is-vip-img is-vip-img-4" data-uid="10148955" src="https://ucenter.51cto.com/images/noavatar_middle.gif"></a>
+			</div>
+			<div class="clear"></div>
+
+		</div>
+	</div>
+</div>
+<!-- 老博文美观处理 -->
+<script src="https://static1.51cto.com/edu/blog/js/countDown.js"></script>
+<script>
+	var praise_url = 'https://blog.51cto.com/praise/praise'
+    	addReply_url = 'https://blog.51cto.com/comments/add'
+    	removeUrl = 'https://blog.51cto.com/comments/del'
+    	blog_id = '2146748'
+    	pv_log_info = {
+            'pv_type':'blog',
+            'user_id':'10148955',
+            'blog_id':'2146748'
+        };
+    	rid = '0'
+    	is_comment = '0'
+    	comment_list = '/blog/ajax-comment-list'
+    	comment_sort = "asc"
+    	index_url = 'https://blog.51cto.com/10158955';
+    	uc_url = 'https://ucenter.51cto.com/'
+    	blog_url = 'https://blog.51cto.com/'
+    	img_url = 'https://static1.51cto.com/edu/blog/'
+    	i_user_id = ''
+    	c_user_id ='10148955'
+    	collect_url = 'https://blog.51cto.com/collect/add'
+    	is_old = '0'
+    	nicknameurl = 'https://blog.51cto.com/10158955'
+    	nickname = '清风一明月'
+    	myself = window.location.href;
+	$('.you-like-list li:odd').css({'margin-left': '10%'});
+	$('.column-box a:odd').addClass('left-list')
+	$('.myUrl').text(myself).click(function(){window.open(myself)})
+	setTimeout(function(){$('.Footer').css({'margin-top':'-50px'})},50)
+    		function FollowBtnSucc(e){//1:未关注,2:已关注,3:互相关注
+		    if(e==2||e==3){
+		        $.post('/index/wxbind',{uid:userId},function(res){
+		            if(res.data.wxBind == 0){//没绑定
+	                    if(getCookie('follow1'))return false;
+	                    box1()
+	                }else{
+	                    if(getCookie('follow2'))return false;
+	                    box2()
+	                }
+		        },'json')
+		    }
+		}
+		FollowBtn = new Follow($('#checkFollow1_10148955'),'10148955','1',['on','in','mutual','off']);
+		FollowBtn.success=FollowBtnSucc;
+		FollowBtn = new Follow($('#checkFollow2_10148955'),'10148955','1',['on','in','mutual','off']);
+		FollowBtn.success=FollowBtnSucc;
+		FollowBtn = new Follow($('#checkFollow3_10148955'),'10148955','1',['on','in','mutual','off']);
+		FollowBtn.success=FollowBtnSucc;
+        	if(is_old==1){
+    // SyntaxHighlighter.all();
+    insertCodeElement("Jenkins\u662f\u4e00\u4e2a\u5f00\u6e90\u9879\u76ee\uff0c\u63d0\u4f9b\u4e86\u4e00\u79cd\u6613\u4e8e\u4f7f\u7528\u7684\u6301\u7eed\u96c6\u6210\u7cfb\u7edf\uff0c\u4f7f\u5f00\u53d1\u8005\u4ece\u7e41\u6742\u7684\u96c6\u6210\u4e2d\u89e3\u8131\u51fa\u6765\uff0c\u4e13\u6ce8\u4e8e\u66f4\u4e3a\u91cd\u8981\u7684\u4e1a\u52a1\u903b\u8f91\u5b9e\u73b0\u4e0a\u3002\u540c\u65f6Jenkins\u80fd\u5b9e\u65bd\u76d1\u63a7\u96c6\u6210\u4e2d\u5b58\u5728\u7684\u9519\u8bef\uff0c\u63d0\u4f9b\u8be6\u7ec6\u7684\u65e5\u5fd7\u6587\u4ef6\u548c\u63d0\u9192\u529f\u80fd\uff0c\u8fd8\u80fd\u7528\u56fe\u8868\u7684\u5f62\u5f0f\u5f62\u8c61\u5730\u5c55\u793a\u9879\u76ee\u6784\u5efa\u7684\u8d8b\u52bf\u548c\u7a33\u5b9a\u6027\u3002\u5e76\u4e14Jenkins\u63d0\u4f9b\u4e86\u5927\u91cf\u7684\u63d2\u4ef6\uff0c\u80fd\u591f\u5b8c\u6210\u5404\u79cd\u4efb\u52a1\u3002\n\n\u4eca\u5929\u6211\u9700\u8981\u4f7f\u7528Jenkins\u6784\u5efa\u4e00\u4e2aDocker\u955c\u50cf\uff0c\u7136\u540e\u81ea\u52a8push\u5230docker registry\u4e2d\u3002\u5230\u4e86docker registry\u4e2d\uff0c\u540e\u9762\u6d4b\u8bd5\u4eba\u5458\u5c31\u53ef\u4ee5\u628a\u955c\u50cf\u53d1\u5e03\u5230\u6d4b\u8bd5\u73af\u5883\uff0c\u6d4b\u8bd5\u5982\u679c\u6ca1\u6709\u95ee\u9898\u5c31\u53ef\u4ee5\u53d1\u5e03\u5230\u7ebf\u4e0a\u73af\u5883\u3002\n\n\u4e0b\u9762\u5148\u4ecb\u7ecdJenkins\u6784\u5efadocker\u955c\u50cf\uff0c\u5728\u4f7f\u7528Jenkins\u6784\u5efaDocker\u955c\u50cf\u4e4b\u524d\uff0c\u6700\u597d\u5148\u770b\u4e00\u4e0bDocker\uff1a\u4f7f\u7528Dockerfile\u6784\u5efaNginx\u955c\u50cf http:\/\/www.ywnds.com\/?p=7611\n**\u5b89\u88c5Jenkins**\n\u6dfb\u52a0Jenkins\u7684\u6e90\uff08repository\uff09\nsudo wget -O \/etc\/yum.repos.d\/jenkins.repo http:\/\/jenkins-ci.org\/redhat\/jenkins.repo\nsudo rpm --import http:\/\/pkg.jenkins-ci.org\/redhat\/jenkins-ci.org.key\n\n\u5b89\u88c5JDK\nyum install java-1.8.0-openjdk -y \u6216\u8005tar\u5305\u5b89\u88c5\u90fd\u4e00\u6837\njava version \"1.8.0_171\"\nJava(TM) SE Runtime Environment (build 1.8.0_171-b11)\nJava HotSpot(TM) 64-Bit Server VM (build 25.171-b11, mixed mode)\n\nyum install jenkins -y\nrpm -qi jenkins | grep Version\nVersion     : 2.132 \uff08\u7248\u672c\u4f1a\u4e0d\u65ad\u66f4\u65b0\uff09\n\u542f\u52a8Jenkins\nservice jenkins start  \uff08start,stop,restart\uff09\n\u5230\u6b64\uff0cJenkins\u5c31\u5b89\u88c5\u5b8c\u6210\u4e86\uff0c\u7136\u540e\u5c31\u53ef\u4ee5\u542f\u52a8Jenkins\u3002\nJenkins\u9ed8\u8ba4\u76d1\u63a7\u7aef\u53e38080\uff0c\u67e5\u770bJenkins\u8fdb\u7a0b\u3002\n![](https:\/\/s1.51cto.com\/images\/blog\/201807\/18\/ec58a55a5c6c54e3c952d28fae2c9b3a.png?x-oss-process=image\/watermark,size_16,text_QDUxQ1RP5Y2a5a6i,color_FFFFFF,t_100,g_se,x_10,y_10,shadow_90,type_ZmFuZ3poZW5naGVpdGk=)\n\n**Jenkins\u6587\u4ef6\u8bf4\u660e**\njenkins\u76f8\u5173\u76ee\u5f55\u91ca\u4e49\uff1a\n(1)\/usr\/lib\/jenkins\/\uff1ajenkins\u5b89\u88c5\u76ee\u5f55\uff0cwar\u5305\u4f1a\u653e\u5728\u8fd9\u91cc\u3002\n(2)\/etc\/sysconfig\/jenkins\uff1ajenkins\u914d\u7f6e\u6587\u4ef6\uff0c\u201c\u7aef\u53e3\u201d\uff0c\u201cJENKINS_HOME\u201d\u7b49\u90fd\u53ef\u4ee5\u5728\u8fd9\u91cc\u914d\u7f6e\u3002\n(3)\/var\/lib\/jenkins\/\uff1a\u9ed8\u8ba4\u7684JENKINS_HOME\u3002\n(4)\/var\/log\/jenkins\/jenkins.log\uff1ajenkins\u65e5\u5fd7\u6587\u4ef6\u3002\n\n\/var\/lib\/jenkins\/jobs\/${project_name}\/workspace\/\uff1aJenkins\u9879\u76ee\u7684\u5de5\u4f5c\u7a7a\u95f4\uff0c\u5b58\u50a8\u4eceGit\u6216SVN\u4e0b\u8f7d\u7684\u5185\u5bb9\uff0c${project_name}\u5c31\u662f\u5176\u9879\u76ee\u540d\u79f0\u3002\n\n**\u914d\u7f6eJenkins\u6784\u5efa\u955c\u50cf**\n\u5982\u679c\u6ca1\u6709\u7279\u522b\u914d\u7f6e\u7aef\u53e3\uff0c\u4f7f\u7528http:\/\/<ip address>:8080\/\u767b\u5f55Jenkins\uff0c\u5e76\u8fdb\u884c\u76f8\u5173\u914d\u7f6e\uff08\u63d2\u4ef6\u5b89\u88c5\u3001\u6743\u9650\u914d\u7f6e\u3001View\/Job\u521b\u5efa\u7b49\u7b49\uff09\u3002\n\n\u7b2c\u4e00\u6b21\u767b\u9646Jenkins\u65f6\u9700\u8981\u89e3\u9501\uff0c\u628a\u5982\u4e0b\u79d8\u94a5\u586b\u5199\u8fdb\u53bb\u5373\u53ef\u3002\ncat \/var\/lib\/jenkins\/secrets\/initialAdminPassword\na737ebbbfece4e6991cf70d45a299ed5\n![](https:\/\/s1.51cto.com\/images\/blog\/201807\/18\/3eecdcf030e5c81ade057ec9e93737e7.png?x-oss-process=image\/watermark,size_16,text_QDUxQ1RP5Y2a5a6i,color_FFFFFF,t_100,g_se,x_10,y_10,shadow_90,type_ZmFuZ3poZW5naGVpdGk=)\n\n\u7136\u540e\u8bbe\u7f6e\u4e00\u4e0b\u7528\u6237\u5bc6\u7801\uff0c\u5c31\u6b63\u5f0f\u8fdb\u5165\u5230\u4e86Jenkins\u914d\u7f6e\u754c\u9762\u3002\n![](https:\/\/s1.51cto.com\/images\/blog\/201810\/13\/2277c3da4b64016fb1bce8620c07bf5e.png?x-oss-process=image\/watermark,size_16,text_QDUxQ1RP5Y2a5a6i,color_FFFFFF,t_100,g_se,x_10,y_10,shadow_90,type_ZmFuZ3poZW5naGVpdGk=)\n\u9996\u5148\uff0c\u9700\u8981\u5b89\u88c5\u4e00\u4e9b\u5fc5\u8981\u7684\u63d2\u4ef6SCM Sync Configuration Plugin \uff0c\uff08gitlab\uff09GitHub plugin \uff0cGIT plugin \uff0cGIT client plugin\uff0c\u5728\u7cfb\u7edf\u7ba1\u7406->\u63d2\u4ef6\u7ba1\u7406\u91cc\u9762\u5b89\u88c5\uff0c\u5b89\u88c5\u7ed3\u675f\u540e\u91cd\u542fjenkins\u5373\u53ef\u3002\n![](https:\/\/s1.51cto.com\/images\/blog\/201810\/13\/935f6697daba9b30ffbb940f8d066a68.png?x-oss-process=image\/watermark,size_16,text_QDUxQ1RP5Y2a5a6i,color_FFFFFF,t_100,g_se,x_10,y_10,shadow_90,type_ZmFuZ3poZW5naGVpdGk=)\n\u7136\u540e\u521b\u5efa\u4e00\u4e2a\u9879\u76ee\u4e3anginx\u3002\n![](https:\/\/s1.51cto.com\/images\/blog\/201807\/18\/27da7fe72fa3a366956119bce8690336.png?x-oss-process=image\/watermark,size_16,text_QDUxQ1RP5Y2a5a6i,color_FFFFFF,t_100,g_se,x_10,y_10,shadow_90,type_ZmFuZ3poZW5naGVpdGk=)\n\u7136\u540e\u914d\u7f6e\u4e00\u4e0b\u6e90\u7801\u7ba1\u7406\uff0cGit\u5730\u5740\uff1ahttps:\/\/github.com\/dongwenpeng\/nginx\n\n\u5c31\u4e0b\u9762\u51e0\u4e2a\u6587\u4ef6\uff0c\u4e3b\u8981\u662fdockerfile\uff0c\u7136\u540e\u63d0\u4f9b\u4e86\u4e00\u4e9bnginx\u914d\u7f6e\u6587\u4ef6\u4ee5\u53caweb\u6587\u4ef6\u3002\n-rw-r--r-- 1 jenkins jenkins    744 Dec 27 20:22 default.conf\n-rw-r--r-- 1 jenkins jenkins    338 Dec 27 20:22 dockerfile\n-rw-r--r-- 1 jenkins jenkins    593 Dec 27 20:22 nginx.conf\ndrwxr-xr-x 3 jenkins jenkins     16 Dec 27 20:22 web\n-rw-r--r-- 1 jenkins jenkins 644118 Dec 27 20:22 web.zip\n\n\u5982\u4e0b\u914d\u7f6e\uff0c\u4e5f\u53ef\u4ee5\u4f7f\u7528\u4f60\u672c\u5730\u7684Git\u4ed3\u5e93\uff1a\n![](https:\/\/s1.51cto.com\/images\/blog\/201807\/18\/6264ac2597f389aa2508f88436686c6b.png?x-oss-process=image\/watermark,size_16,text_QDUxQ1RP5Y2a5a6i,color_FFFFFF,t_100,g_se,x_10,y_10,shadow_90,type_ZmFuZ3poZW5naGVpdGk=)\n\n\u4e3b\u8981\u5c31\u662f\u6784\u5efa\u811a\u672c\u4e86\u3002\n![](https:\/\/s1.51cto.com\/images\/blog\/201807\/18\/45137b6cb444f0cf132a1b9d84513df5.png?x-oss-process=image\/watermark,size_16,text_QDUxQ1RP5Y2a5a6i,color_FFFFFF,t_100,g_se,x_10,y_10,shadow_90,type_ZmFuZ3poZW5naGVpdGk=)\n\n\u811a\u672c\u5185\u5bb9\n#!\/bin\/sh\n#\nDATE=`date +%m%d%H%M `\nDIR=\"\/var\/lib\/jenkins\/jobs\/nginx\/workspace\"\n \nsudo \/bin\/docker build -t nginx_$DATE $DIR | tee $DIR\/Docker_build_result.log\n \nRESULT=$(cat $DIR\/Docker_build_result.log | tail -n 1)\n \nif [[\"$RESULT\" != *Successfully*]];then\n  exit -1\nfi\n\n\u6ce8\u610f\uff1a\u8fd9\u91cc\u8bf4\u660e\u51e0\u70b9\uff0c\u7b2c\u4e00git\u6ca1\u6709\u7684\u5c31\u5b89\u88c5 yum -y install git\n\/var\/lib\/jenkins\/jobs\/nginx\/workspace\u8fd9\u91cc\u7684\u8def\u5f84\u5c11\u4e86\u4e2aworkspace\u9700\u8981\u521b\u5efa\nchown -R jenkins:jenkins workspace\/\n\u4e4b\u540e\u8981\u91cd\u542fJenkins\u3002\n\n**\u914d\u7f6ejenkins\u7528\u6237**\n\u6b64\u65f6\u8fd8\u4e0d\u80fd\u7acb\u5373\u6784\u5efa\uff0c\u56e0\u4e3ajenkins\u89e6\u53d1\u811a\u672c\u5e76\u4e0d\u662froot\u7528\u6237\uff0c\u56e0\u6b64\u9700\u8981\u5c06jenkins\u514d\u5bc6\u7801\uff0c\u5e76\u5c06\u7528\u6237\u52a0\u5165\u5230docker\u7ec4\u3002\uff08\u8fd9\u91ccdocker \u6ca1\u6709\u4e5f\u8981\u5b89\u88c5 https:\/\/blog.51cto.com\/10158955\/2125450 \uff09\ncat \/etc\/sudoers.d\/jenkins\nDefaults:jenkins !requiretty\njenkins ALL=(ALL) NOPASSWD: ALL\n\u7b2c\u4e00\u884c\u8868\u793a\u4ec5jenkins\u7528\u6237\u4e0d\u9700\u8981\u63a7\u5236\u7ec8\u7aef\uff0c\u4e0d\u7136\u5728Jenkins\u811a\u672c\u4e2d\u65e0\u6cd5\u4f7f\u7528sudo\u3002\nusermod -G docker jenkins\n\uff08\u521b\u5efadocker\u7ec4   groupadd docker  \uff09\n\n**\u5f00\u59cb\u6784\u5efa\u955c\u50cf**\n\u5728jenkins\u7684build\u8bb0\u5f55\u4e2d\u53ef\u4ee5\u770b\u5230\u8f93\u51fa\uff0c\u7531\u4e8ejenkins\u4f1a\u81ea\u52a8\u628agithub\u4e0a\u7684\u6587\u4ef6\u7ed9\u4e0b\u8f7d\u4e0b\u6765\u653e\u5728workspace\u76ee\u5f55\u4e2d\u3002\u56e0\u6b64\uff0c\u89e6\u53d1\u811a\u672c\u540e\uff0c\u76f4\u63a5\u5f00\u59cb\u6784\u5efanginx\u955c\u50cf\u3002\nStarted by user admin\nBuilding in workspace \/var\/lib\/jenkins\/jobs\/nginx\/workspace\n > git rev-parse --is-inside-work-tree # timeout=10\nFetching changes from the remote Git repository\n > git config remote.origin.url https:\/\/github.com\/dongwenpeng\/nginx # timeout=10\nFetching upstream changes from https:\/\/github.com\/dongwenpeng\/nginx\n > git --version # timeout=10\n > git fetch --tags --progress https:\/\/github.com\/dongwenpeng\/nginx +refs\/heads\/*:refs\/remotes\/origin\/*\n > git rev-parse refs\/remotes\/origin\/master^{commit} # timeout=10\n > git rev-parse refs\/remotes\/origin\/origin\/master^{commit} # timeout=10\nChecking out Revision c0148c6714be8a64710d87e2ebc3395573dfcb0f (refs\/remotes\/origin\/master)\n > git config core.sparsecheckout # timeout=10\n > git checkout -f c0148c6714be8a64710d87e2ebc3395573dfcb0f\n > git rev-list c0148c6714be8a64710d87e2ebc3395573dfcb0f # timeout=10\n[workspace] $ \/bin\/sh \/tmp\/hudson3618361245563383297.sh\nSending build context to Docker daemon 557.1 kB\nSending build context to Docker daemon 1.114 MB\nSending build context to Docker daemon 1.671 MB\nSending build context to Docker daemon 2.228 MB\nSending build context to Docker daemon 2.785 MB\nSending build context to Docker daemon 3.273 MB\nStep 1 : FROM nginx\nlatest: Pulling from library\/nginx\nDigest: sha256:2a07a07e5bbf62e7b583cbb5257357c7e0ba1a8e9650e8fa76d999a60968530f\nStatus: Downloaded newer image for nginx:latest\n ---> 19146d5729dc\nStep 2 : MAINTAINER dkey\n ---> Using cache\n ---> 715cd864289f\nStep 3 : ENV RUN_USER nginx\n ---> Using cache\n ---> 919de987c861\nStep 4 : ENV RUN_GROUP nginx\n ---> Using cache\n ---> 12bb383d0cdc\nStep 5 : ENV DATA_DIR \/data\/web\n ---> Using cache\n ---> 69561736d70e\nStep 6 : ENV LOG_DIR \/data\/log\/nginx\n ---> Using cache\n ---> c9be367631c7\nStep 7 : RUN mkdir \/data\/log\/nginx -p\n ---> Using cache\n ---> 137c4decd554\nStep 8 : RUN chown nginx.nginx -R \/data\/log\/nginx\n ---> Using cache\n ---> 4262ffbc2a5c\nStep 9 : ADD web \/data\/web\n ---> ac936a598dc4\nRemoving intermediate container 1efe9556276a\nStep 10 : ADD nginx.conf \/etc\/nginx\/nginx.conf\n ---> 2b6f7ab35d9f\nRemoving intermediate container 12b1066d8808\nStep 11 : ADD default.conf \/etc\/nginx\/conf.d\/default.conf\n ---> 619fc14e58bf\nRemoving intermediate container 362067e9bbce\nStep 12 : EXPOSE 80\n ---> Running in ace973e663f0\n ---> 7982205f27dd\nRemoving intermediate container ace973e663f0\nStep 13 : ENTRYPOINT nginx -g \"daemon off;\"\n ---> Running in 892e45827ff4\n ---> 63375850b045\nRemoving intermediate container 892e45827ff4\nSuccessfully built 63375850b045\nFinished: SUCCESS\n\n\u6784\u5efa\u5b8c\u6210\u540e\uff0c\u53ef\u4ee5\u53bbJenkins\u4e3b\u673a\u770b\u770b\u955c\u50cf\u662f\u5426\u5b8c\u6210\u3002\ndocker images\nREPOSITORY                  TAG                 IMAGE ID            CREATED             SIZE\nnginx_12272051              latest              63375850b045        58 minutes ago      182.7 MB\nnginx                       latest              19146d5729dc        6 days ago          181.6 MB\n\n\u53ef\u4ee5\u770b\u5230\u5df2\u7ecf\u6784\u5efa\u5b8c\u6210\u4e86\uff0c\u4e0b\u9762\u76f4\u63a5\u542f\u52a8\u6b64\u955c\u50cf\u3002\ndocker run --name nginx -p 80:80 -d nginx_12272051\n\ndocker ps\nCONTAINER ID      IMAGE              COMMAND                  CREATED             STATUS            PORTS                         NAMES\nc6ca642a3574      nginx_12272051     \"\/bin\/sh -c 'nginx -g\"   18 seconds ago      Up 17 seconds     0.0.0.0:80->80\/tcp, 443\/tcp   nginx\n\n\u63a8\u9001\u5230\u8fdc\u7a0b\u4ed3\u5e93\n\n\u73b0\u5728\u4f7f\u7528Jenkins\u6784\u5efaDocker\u955c\u50cf\u5df2\u7ecf\u6ca1\u6709\u95ee\u9898\u4e86\uff0c\u4e0b\u9762\u5c31\u53ef\u4ee5\u628aJenkins\u6784\u5efa\u5b8c\u7684\u955c\u50cf\u76f4\u63a5\u63a8\u9001\u5230\u8fdc\u7a0b\u7684registry\u4e2d\u3002\u5173\u4e8e\u6784\u5efa\u79c1\u6709docker registry\u53ef\u4ee5\u770bDocker\uff1a\u642d\u5efa\u79c1\u6709\u4ed3\u5e93\uff08Registry 2.4\uff09http:\/\/www.ywnds.com\/?p=7411\n\n\u5f53\u8fdc\u7a0b\u4ed3\u5e93\u641e\u5b9a\u540e\uff0c\u5176\u5b9eJenkins\u8fd9\u8fb9\u505a\u7684\u5e76\u4e0d\u662f\u592a\u591a\uff0c\u53ea\u9700\u8981\u628a\u6784\u5efa\u811a\u672c\u4fee\u6539\u4e00\u4e0b\uff0c\u5728\u6784\u5efa\u5b8c\u6210\u540e\u76f4\u63a5\u63a8\u9001\u5230\u8fdc\u7a0b\u4ed3\u5e93\u5c31OK\u4e86\u3002", '#result');
+  }
+
+  function insertCodeElement(content, container){
+    container = container || document;
+    // 创建一个 div 来放置获取到的内容，这样就可以把 content 字符串内容转换成 dom
+    // 方便我们对这个 dom 进行操作（只是创建 div，并没有插入到文档，他只存在于内存中）
+    var parent = document.createElement('div');
+    parent.innerHTML = content;
+
+    // 找到 parent 中的所有 pre 标签，并遍历
+    var $pres = $(parent).find('pre');
+    $pres.each(function(index, el) {
+      var $el = $(el),
+          html = $el.html(),
+          code = document.createElement('code'),
+          elClass = $el.attr('class');
+      if(!elClass) {return};
+          // 获取 pre 标签中，class 属性中包含的本段代码所有的编程语言
+      var language = elClass.substring(6, elClass.indexOf(';'));
+
+      code.className = 'language-' + language;
+      code.innerHTML = html;
+
+      $el.html(code);
+    });
+
+    $(container).html(parent.innerHTML);
+
+    // 最后，调用 Prism 的方法来高亮代码
+    Prism.highlightAll();
+  }
+	window._bd_share_config={
+    "common":{
+      "bdText":"安装Jenkins并构建Docker镜像",
+      "bdDesc":$("#abstract_bdshare").text(),
+      "bdMini":"2",
+      "bdMiniList":false,
+      "bdPic":"https://s1.51cto.com/images/201710/25/bd540a4f14d822f6e69087758699358b.jpg",
+      "bdStyle":"0",
+      "bdSize":"16"
+    },
+    "share":{}
+  };
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+  setTimeout(function(){
+  	$('.bdsharebuttonbox a').removeAttr('title')
+  },1000);
+
+	var now_time = 1553506547; //当前时间
+  setInterval(function(){now_time+=0.01},10);
+
+  // 初始化页面
+  updatePage();
+  // 页面tab切换
+  zDate.visibilityAction(function () {
+    zDate.getServerTime(function (e) {
+      var updateResult = new Date(e).getTime();
+      now_time = +updateResult.toString().substr(0, 10);
+      updatePage();
+    });
+   })
+  // 定时刷新现在时间
+  setInterval(function () {
+    zDate.getServerTime(function (e) {
+      var updateResult = new Date(e).getTime();
+      now_time = +updateResult.toString().substr(0, 10);
+      updatePage();
+    });
+  }, 1000*60*2);
+  // 页面刷新
+  function updatePage() {
+    $('.presell').each(function(index, item) {
+      var end_time = $(this).data('end'); // 结束时间
+      if (!end_time) {
+        return;
+      }
+      var me = $(this);
+      if (me.lastTime) {
+        clearInterval(me.lastTime);
+        me.lastTime = null;
+      } else {
+        me.lastTime = setInterval(function() {
+          zDate.setLastTimePc(me.find('.timespan'), (end_time*1000-now_time*1000), me.lastTime, function() {
+						me.parents('.right').find('.cloumn-subscribe').removeClass('presell-color');
+						me.remove();
+						$('.pre-tips').remove();
+					});
+        }, 10);
+      }
+    });
+  }
+		//二维码显示
+		$(".group_git_box").hover(function(){
+			$(this).parents('.group_img_box').find(".group_code_box").show()
+		},function(){
+			$(this).parents('.group_img_box').find(".group_code_box").hide()
+		})  
+</script>
+</div>
+<script src="https://static1.51cto.com/edu/blog/js/marked.min.js"></script><script src="https://static1.51cto.com/edu/blog/js/highlight.js"></script><script src="https://static1.51cto.com/edu/blog/js/detail_mp.js"></script><script src="https://static1.51cto.com/edu/blog/js/detail.js"></script><script src="https://static1.51cto.com/edu/blog/js/details_new.js"></script><script src="https://static1.51cto.com/edu/blog/js/copy.js"></script>    <script src="https://static1.51cto.com/edu/blog/js/pvlog.js"></script>
+<script>
+  $(".gotop").click(function(){$(window).scrollTop(0)})
+</script>
+
+
+    <script type="text/javascript">
+    //百度统计代码
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?2283d46608159c3b39fc9f1178809c21";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+
+    //自动推送链接
+    (function(){
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        }
+        else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+    </script>
+
+    <script type='text/javascript'>
+      var _vds = _vds || [];
+      window._vds = _vds;
+      (function(){
+        _vds.push(['setAccountId', '8c51975c40edfb67']);
+        (function() {
+          var vds = document.createElement('script');
+          vds.type='text/javascript';
+          vds.async = true;
+          vds.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'assets.growingio.com/vds.js';
+          var s = document.getElementsByTagName('script')[0];
+          s.parentNode.insertBefore(vds, s);
+        })();
+      })();
+      //document.write(decodeURI("%3Cscript src='https://tongji.51cto.com/frontend/tj.gif' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    
+<script>
+  var uid = '';
+  var BLOG_URL = 'https://blog.51cto.com/';
+</script>
+<script src="https://static1.51cto.com/edu//blog/js/jquery.cookie.js"></script>
+<script src="https://static1.51cto.com/edu/blog/js/time-on-page.js" charset="utf-8"></script>
+<script>
+    (function(){
+        var wh=$(window).height(),fh=$('.Footer').outerHeight(true),hh=$('.Header').outerHeight(true)
+        $('.Content-box').css({'min-height': wh-fh-hh})
+    })()
+</script>
+</body>
+</html>
