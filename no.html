@@ -1,0 +1,191 @@
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>电话查询</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css" />
+<link rel="stylesheet" href="/assets/bootstrap/css/bootstrap-theme.min.css" />
+<link rel="stylesheet" href="/assets/bootstrapvalidator/css/bootstrapValidator.css" />
+</head>
+<body>
+<div class="container-fluid">
+	<div class="row-fluid">
+		<div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12">
+			<div class="page-header">
+				<h2>电话查询</h2>
+			</div>
+
+			<form id="defaultForm" method="post" class="form-horizontal" action="../dhcx/index">
+				
+				<div class="form-group">
+					<div class="col-lg-3">
+                            <select class="form-control" name="unit1" data-bv-notempty data-bv-notempty-message="单位名称">
+                                <option value="" selected="selected">--所属单位--</option>
+                                
+					          	<option value="北京市公安局">北京市公安局</option>
+					          	<option value="户政办理大厅">户政办理大厅</option>
+					          	<option value="出入境管理总队">出入境管理总队</option>
+					          	<option value="人口管理总队">人口管理总队</option>
+					          	<option value="公安交通管理局">公安交通管理局</option>
+					          	<option value="消防局">消防局</option>
+					          	<option value="治安管理总队">治安管理总队</option>
+					          	<option value="禁毒总队">禁毒总队</option>
+					          	<option value="经济犯罪侦查总队">经济犯罪侦查总队</option>
+					          	<option value="内保局">内保局</option>
+					          	<option value="公交总队">公交总队</option>
+					          	<option value="强制治疗管理处">强制治疗管理处</option>
+					          	<option value="特警总队">特警总队</option>
+					          	<option value="网安总队">网安总队</option>
+					          	<option value="巡警总队">巡警总队</option>
+					          	<option value="预审总队">预审总队</option>
+					          	<option value="监区医疗管理处">监区医疗管理处</option>
+					          	<option value="监所管理总队">监所管理总队</option>
+					          	<option value="北京市保安服务总公司">北京市保安服务总公司</option>
+					          	<option value="东城公安分局">东城公安分局</option>
+					          	<option value="西城公安分局">西城公安分局</option>
+					          	<option value="朝阳公安分局">朝阳公安分局</option>
+					          	<option value="海淀公安分局">海淀公安分局</option>
+					          	<option value="丰台公安分局">丰台公安分局</option>
+					          	<option value="大兴公安分局">大兴公安分局</option>
+					          	<option value="房山公安分局">房山公安分局</option>
+					          	<option value="怀柔公安分局">怀柔公安分局</option>
+					          	<option value="昌平公安分局">昌平公安分局</option>
+					          	<option value="门头沟公安分局">门头沟公安分局</option>
+					          	<option value="密云公安分局">密云公安分局</option>
+					          	<option value="平谷公安分局">平谷公安分局</option>
+					          	<option value="石景山公安分局">石景山公安分局</option>
+					          	<option value="顺义公安分局">顺义公安分局</option>
+					          	<option value="通州公安分局">通州公安分局</option>
+					          	<option value="延庆公安分局">延庆公安分局</option>
+					          	<option value="开发区分局">开发区分局</option>
+					          	<option value="天安门地区公安分局">天安门地区公安分局</option>
+					          	<option value="清河公安分局">清河公安分局</option>
+					          	<option value="西站分局">西站分局</option></select>
+
+					</div>
+					<div class="col-lg-3">
+                            <select class="form-control" name="city" data-bv-notempty data-bv-notempty-message="单位名称">
+                                <option value="" selected="selected">--所在区--</option>
+					          	<option value="东城区">东城区</option>
+					          	<option value="西城区">西城区</option>
+					          	<option value="朝阳区">朝阳区</option>
+								<option value="海淀区">海淀区</option>
+					          	<option value="丰台区">丰台区</option>
+					          	<option value="石景山区">石景山区</option>
+					          	<option value="门头沟区">门头沟区</option>
+					          	<option value="通州区">通州区</option>
+					          	<option value="房山区">房山区</option>
+					          	<option value="大兴区">大兴区</option>
+					          	<option value="昌平区">昌平区</option>
+					          	<option value="顺义区">顺义区</option>
+					          	<option value="平谷区">平谷区</option>
+					          	<option value="怀柔区">怀柔区</option>
+					          	<option value="延庆区">延庆区</option>
+					          	<option value="密云区">密云区</option>
+					          	<option value="">其它区</option></select>
+
+					</div>
+					<div class="col-lg-3">
+						<input type="text" class="form-control" id="unit2" name="unit2" placeholder="部门名称">
+					</div>
+					<div class="col-lg-3">
+						<button type="submit" class="btn btn-primary" name=""
+							value="">查询</button>
+					</div>
+				</div>
+				
+			</form>
+			
+			
+			<table class="table table-striped">
+				<thead>
+				<tr>
+					<td align="center">序号</td>
+					<td align="center">单位名称</td>
+					<td align="center">咨询电话</td>
+				</tr>
+				</thead>
+				<tbody>
+			
+				<tr>
+					<td align="center">1</td>
+					<td align="center">大屯派出所</td>
+					<td align="center">64949248</td>
+				</tr>
+				<tr>
+				<td>&nbsp;</td>
+				<td colspan="3">朝阳区大屯220号6号楼</td>
+				</tr>
+				<tr>
+				<td>&nbsp;</td>
+				<td colspan="3">城铁5号线大屯东站下车向东200米后向南200米即到，北京农村商业银行东200米</td>
+				</tr>
+			
+			</tbody>
+			</table>
+			
+
+
+<nav aria-label="Page navigation">
+  <ul class="pagination">
+			
+			
+				 <li><a href="../dhcx/index?pager.offset=0&unit1=朝阳公安分局&unit2=大屯&city=朝阳区">
+				  <span aria-hidden="true">|&laquo;</span></a>
+				  </li>
+			
+			
+			
+			 
+		        
+		            
+		            	<li class="active"><a href="#">1</a></li>
+		            
+		            
+		        
+		    
+		    
+			  
+				<li><a  href="../dhcx/index?pager.offset=0&unit1=朝阳公安分局&unit2=大屯&city=朝阳区" class="next_p" title="下一页"> 
+				<span aria-hidden="true">&raquo;|</span>
+				</a></li>
+			 
+			<li><a >共1页 1条</a></li>
+    
+   
+  </ul>
+</nav>
+			
+		  </div>
+		</div>
+	
+
+	<!-- 内容区域结束 -->
+		</div>
+	</div>
+	
+	
+	
+	
+</div>
+
+<!--  -->
+<script type="text/javascript" src="/assets/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="/assets/bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/assets/bootstrapvalidator/js/bootstrapValidator.js"></script>
+
+<!--  -->
+</body>
+</html>
